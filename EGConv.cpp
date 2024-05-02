@@ -3,6 +3,7 @@
 #include <regex>
 using namespace std;
 
+//Apply Demorgans
 string negative(string& subgraph){
   string temp;
   for (size_t i = 0; i < subgraph.length(); i++) {
