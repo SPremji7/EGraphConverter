@@ -1,5 +1,4 @@
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <regex>
 using namespace std;
@@ -30,7 +29,7 @@ string negative(string& subgraph){
   return temp;
 }
 
-
+//Parses Sentence to recursively find atomics
 string parseGraph(string& graph){
   if (graph.length()==0) {
     return "";
@@ -44,6 +43,7 @@ string parseGraph(string& graph){
     }
     return graph.substr(0,1)+"&"+parseGraph(temp);
   }
+
   else if(graph.substr(0,1) =="(") {
     int open = 1;
     for (size_t i = 1; i < graph.length(); i++) {
@@ -55,25 +55,28 @@ string parseGraph(string& graph){
       }
       if(open==0){
         temp = graph.substr(1, i-1);
-        string postTemp = graph.substr(i, graph.length()-i);
+        string postTemp = graph.substr(i+1, graph.length()-i);
         temp = parseGraph(temp);
         if (postTemp.length()<=1) {
           return "["+negative(temp)+"]";
         }
         return "["+negative(temp)+"]&"+parseGraph(postTemp);
-        
-        
       }      
     }
   }
+
   else{
-    temp = graph.substr(1, graph.length()-1);
-    return parseGraph(temp);
+    temp  = graph.substr(1, graph.length()-1);
+    if(graph.length()==1){
+      return graph.substr(0,1);
+    }
+    return graph.substr(0,1)+"&"+parseGraph(temp);
   } 
+
   return "";
 }  
 
-
+//Changes all characters to logic characters
 string cleanUp(string& output){
     std::string result;
     for (char ch : output) {
@@ -99,8 +102,8 @@ string ifThen(string& output, string& pattern, string& replacement){
   return std::regex_replace(output, re, replacement);
 }
 
-int main(int argc, char* argv[]){
-  cout<<"Input Graph\nFormat: (A(B))\n==>";
+int main(){
+  cout<<"Input Graph\nFormat: A(A(B))\n==>";
   string graph, output, outThen;
   cin>>graph;
   cout<<graph<<"\n";
@@ -113,6 +116,8 @@ int main(int argc, char* argv[]){
   outThen = ifThen(output, pattern, replacement);
 
   cout<<"\n1)"<<output<<"\n";
-  cout<<"2)"<<outThen<<"\n";
-
+  if (output.compare(outThen)!=0) {
+    cout<<"2)"<<outThen<<"\n";
+  }
+  
 }
